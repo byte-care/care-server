@@ -35,7 +35,7 @@ func (s realService) email(address string, subject string, body string) error {
 	request.Version = "2015-11-23"
 	request.ApiName = "SingleSendMail"
 
-	request.QueryParams["AccountName"] = "no-reply@kan-fun.com"
+	request.QueryParams["AccountName"] = "no-reply@bytecare.xyz"
 	request.QueryParams["AddressType"] = "1"
 	request.QueryParams["ReplyToAddress"] = "false"
 	request.QueryParams["ToAddress"] = address
