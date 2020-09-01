@@ -1,13 +1,11 @@
 package main
 
-import (
-	"github.com/gin-gonic/gin"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-)
+import "github.com/gin-gonic/gin"
 
 func setupRouter() *gin.Engine {
 	r := gin.Default()
 
+	r.POST("/send-email-code", sendEmailCode)
 	r.POST("/signup", signup)
 
 	return r

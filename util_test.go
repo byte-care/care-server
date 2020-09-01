@@ -10,6 +10,7 @@ import (
 func init() {
 	setup(true)
 	router = setupRouter()
+	serviceGlobal = mockService{}
 }
 
 func dropDB() {
