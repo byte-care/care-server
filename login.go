@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"github.com/jinzhu/gorm"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -23,9 +25,11 @@ func login(c *gin.Context) {
 	}
 
 	var user model.User
-	db.Select("id").Where("email = ? AND password = ?", email, hashPassword(password)).First(&user)
-
-	if user.ID == 0 {
+	result := db.Select("id").Where("email = ? AND password = ?", email, hashPassword(password)).First(&user)
+	if result.Error != nil {
+		if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			log.Println(result.Error)
+		}
 		c.String(403, "")
 		return
 	}
