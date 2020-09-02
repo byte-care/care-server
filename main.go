@@ -10,6 +10,8 @@ func setupRouter() *gin.Engine {
 	r.POST("/login", login)
 	r.POST("/view-key", viewKey)
 
+	r.POST("/send-email", sendEmail)
+
 	return r
 }
 
