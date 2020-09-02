@@ -7,6 +7,7 @@ func setupRouter() *gin.Engine {
 
 	r.POST("/send-email-code", sendEmailCode)
 	r.POST("/signup", signup)
+	r.POST("/login", login)
 
 	return r
 }
