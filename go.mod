@@ -11,6 +11,7 @@ require (
 	github.com/byte-care/care-server-core v0.0.0-20200831080505-65ad9859d754
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.3
+	github.com/gorilla/websocket v1.4.2
 	github.com/jinzhu/gorm v1.9.16
 	github.com/stretchr/testify v1.5.1
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
