@@ -45,7 +45,6 @@ func autoMigrate() {
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.ChannelEmail{})
 	db.AutoMigrate(&model.ChannelWeChat{})
-	db.AutoMigrate(&model.Task{})
 }
 
 func setup(test bool) {

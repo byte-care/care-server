@@ -17,7 +17,6 @@ func dropDB() {
 	db.DropTable(&model.User{})
 	db.DropTable(&model.ChannelEmail{})
 	db.DropTable(&model.ChannelWeChat{})
-	db.DropTable(&model.Task{})
 }
 
 func dropAndMigrate() {
