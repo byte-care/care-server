@@ -40,6 +40,7 @@ var secretKeyGlobal []byte
 
 var db *gorm.DB
 var serviceGlobal service
+var wechatNotifyServiceGlobal notifyService
 
 func autoMigrate() {
 	db.AutoMigrate(&model.User{})

@@ -22,7 +22,8 @@ func setupRouter() *gin.Engine {
 func main() {
 	setup(false)
 	serviceGlobal = realService{}
+	wechatNotifyServiceGlobal = realWechatNotifyService{}
 
 	r := setupRouter()
-	r.Run(":8080")
+	_ = r.Run(":8080")
 }

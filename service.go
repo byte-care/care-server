@@ -13,6 +13,16 @@ import (
 	core "github.com/byte-care/care-core"
 )
 
+type notifyService interface {
+	//logPubResult(userID uint, topic string, isSuccessful bool) error
+}
+
+type realWechatNotifyService struct {
+}
+
+type mockWechatNotifyService struct {
+}
+
 type service interface {
 	email(address string, subject string, body string) error
 	sms(number string, code string) error
@@ -55,6 +65,7 @@ func (s realService) email(address string, subject string, body string) error {
 	return nil
 }
 
+//goland:noinspection GoUnusedParameter
 func (s mockService) email(address string, subject string, body string) error {
 	return nil
 }
@@ -78,6 +89,7 @@ func (s realService) sms(number string, code string) error {
 	return nil
 }
 
+//goland:noinspection GoUnusedParameter
 func (s mockService) sms(number string, code string) error {
 	return nil
 }
@@ -172,6 +184,7 @@ func (s realService) logGetToEnd(reversedID string, fromHead bool, lastAutoID in
 	return
 }
 
+//goland:noinspection GoUnusedParameter
 func (s mockService) logGetToEnd(reversedID string, fromHead bool, lastAutoID int64) (result []string, newLastAutoID int64, err error) {
 	return
 }
