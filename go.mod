@@ -19,6 +19,7 @@ require (
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
+	github.com/silenceper/wechat v1.2.6
 	github.com/stretchr/testify v1.5.1
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
 	google.golang.org/protobuf v1.24.0 // indirect

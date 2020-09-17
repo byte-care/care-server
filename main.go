@@ -11,6 +11,7 @@ func setupRouter() *gin.Engine {
 	r.POST("/view-key", viewKey)
 
 	r.GET("/wechat", wechatGet)
+	r.POST("/wechat", wechatPost)
 
 	r.POST("/send-email", sendEmail)
 
