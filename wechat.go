@@ -18,6 +18,24 @@ func wechatPost(c *gin.Context) {
 		return
 	}
 
+	if req.MsgType == message.MsgTypeEvent {
+		if req.Event == message.EventClick {
+			//openID := req.FromUserName
+
+			if req.EventKey == "task_list" {
+				resp := message.NewText(`task_list`)
+				resp.SetToUserName(req.FromUserName)
+				resp.SetFromUserName(req.ToUserName)
+				resp.SetCreateTime(req.CreateTime)
+				resp.SetMsgType("text")
+
+				c.XML(200, resp)
+
+				return
+			}
+		}
+	}
+
 	resp := message.NewText(`ByteCare`)
 	resp.SetToUserName(req.FromUserName)
 	resp.SetFromUserName(req.ToUserName)
