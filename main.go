@@ -15,6 +15,7 @@ func setupRouter() *gin.Engine {
 	r.POST("/signup", signup)
 	r.POST("/login", login)
 	r.POST("/view-key", viewKey)
+	r.POST("/set-default-channel", setDefaultChannel)
 
 	r.GET("/wechat", wechatGet)
 	r.POST("/wechat", wechatPost)
