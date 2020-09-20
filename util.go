@@ -30,6 +30,9 @@ var aliyunRegionID string
 var aliyunAccessKey string
 var aliyunSecretKey string
 
+var GitHubClientID string
+var GitHubClientSecret string
+
 var clientGlobal *sdk.Client
 var ossClientGlobal *oss.Client
 var tableStoreClientGlobal *tablestore.TableStoreClient
@@ -46,6 +49,7 @@ func autoMigrate() {
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.ChannelEmail{})
 	db.AutoMigrate(&model.ChannelWeChat{})
+	db.AutoMigrate(&model.OAuthGitHub{})
 }
 
 func setup(test bool) {
@@ -73,6 +77,18 @@ func setup(test bool) {
 			panic("CARE_SECRET_KEY_STR not set")
 		}
 		secretKeyStr = secretKeyStrLocal
+
+		GitHubClientIDLocal, ok := os.LookupEnv("CARE_GITHUB_CLIENT_ID")
+		if !ok {
+			panic("CARE_GITHUB_CLIENT_ID not set")
+		}
+		GitHubClientID = GitHubClientIDLocal
+
+		GitHubClientSecretLocal, ok := os.LookupEnv("CARE_GITHUB_CLIENT_SECRET")
+		if !ok {
+			panic("CARE_GITHUB_CLIENT_SECRET not set")
+		}
+		GitHubClientSecret = GitHubClientSecretLocal
 	}
 
 	mrand.Seed(time.Now().UnixNano())

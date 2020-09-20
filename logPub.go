@@ -35,7 +35,7 @@ func sendPing(quit chan struct{}, conn *websocket.Conn) {
 		select {
 		case <-ticker.C:
 			if err := conn.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(writeWait)); err != nil {
-				log.Println(err)
+				log.Println(err.Error())
 			}
 		case <-quit:
 			return
@@ -70,20 +70,20 @@ func logPub(c *gin.Context) {
 
 	_, topicBytes, err := conn.ReadMessage()
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 		return
 	}
 	topic := string(topicBytes)
 
 	_, taskTypeBytes, err := conn.ReadMessage()
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 		return
 	}
 
 	taskType, err := strconv.Atoi(string(taskTypeBytes))
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 		return
 	}
 
@@ -91,7 +91,7 @@ func logPub(c *gin.Context) {
 
 	taskID, err := serviceGlobal.newTask(reversedUserID, topic, taskType)
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 		return
 	}
 
@@ -101,35 +101,35 @@ func logPub(c *gin.Context) {
 			if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
 				err = serviceGlobal.updateTaskStatus(reversedUserID, taskID, 1)
 				if err != nil {
-					log.Println(err)
+					log.Println(err.Error())
 				}
 
 				err = serviceGlobal.email("1423527051@qq.com", topic, "")
 				if err != nil {
-					log.Println(err)
+					log.Println(err.Error())
 				}
 			} else if websocket.IsCloseError(err, 4000) {
 				// Todo: do sth if user want to get notify when exit code not 0
 				err = serviceGlobal.updateTaskStatus(reversedUserID, taskID, 2)
 				if err != nil {
-					log.Println(err)
+					log.Println(err.Error())
 				}
 
 				err = serviceGlobal.email("1423527051@qq.com", topic, "")
 				if err != nil {
-					log.Println(err)
+					log.Println(err.Error())
 				}
 			} else {
 				// Todo: do sth if user want to get notify when websocket disconnect abnormal
 				if err := serviceGlobal.updateTaskStatus(reversedUserID, taskID, 3); err != nil {
-					log.Println(err)
+					log.Println(err.Error())
 				}
 
 				log.Println(err.Error())
 
 				err = serviceGlobal.email("1423527051@qq.com", topic, "")
 				if err != nil {
-					log.Println(err)
+					log.Println(err.Error())
 				}
 			}
 
@@ -139,7 +139,7 @@ func logPub(c *gin.Context) {
 		content := string(contentBytes)
 
 		if err := serviceGlobal.newLog(taskID, content); err != nil {
-			log.Println(err)
+			log.Println(err.Error())
 		}
 	}
 }

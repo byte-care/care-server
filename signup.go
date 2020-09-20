@@ -56,14 +56,14 @@ func signup(c *gin.Context) {
 
 	accessKey, err := generateKey()
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 		c.String(403, "")
 		return
 	}
 
 	secretKey, err := generateKey()
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 		c.String(403, "")
 		return
 	}
@@ -76,7 +76,7 @@ func signup(c *gin.Context) {
 	}
 
 	if err := db.Create(user).Error; err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 		c.String(403, "")
 		return
 	}
@@ -88,14 +88,14 @@ func signup(c *gin.Context) {
 	}
 
 	if err := db.Create(cEmail).Error; err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 		c.String(403, "")
 		return
 	}
 
 	token, err := generateIDToken(fmt.Sprint(user.ID))
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 		c.String(403, "")
 		return
 	}

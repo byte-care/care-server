@@ -48,7 +48,7 @@ func sendEmail(c *gin.Context) {
 
 	err = serviceGlobal.email(cEmail.Address, topic, msg)
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 		c.String(403, "Fail to Send Email")
 		return
 	}

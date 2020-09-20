@@ -36,7 +36,7 @@ func login(c *gin.Context) {
 
 	token, err := generateIDToken(fmt.Sprint(user.ID))
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 		c.String(403, "")
 		return
 	}
