@@ -27,6 +27,7 @@ type service interface {
 	email(address string, subject string, body string) error
 	sms(number string, code string) error
 	bin(platform string) ([]string, error)
+	getBriefTaskList(userId string) (result []task, err error)
 	logGetToEnd(reversedID string, fromHead bool, lastAutoID int64) ([]string, int64, error)
 	newTask(reversedUserID string, topic string, _type int) (taskID int64, err error)
 	updateTaskStatus(reversedUserID string, taskID int64, status int) (err error)
@@ -179,6 +180,54 @@ func (s realService) logGetToEnd(reversedID string, fromHead bool, lastAutoID in
 			getRangeRequest.RangeRowQueryCriteria.StartPrimaryKey = getRangeResp.NextStartPrimaryKey
 			getRangeResp, err = tableStoreClientGlobal.GetRange(getRangeRequest)
 		}
+	}
+
+	return
+}
+
+type task struct {
+	topic  string
+	status int64
+}
+
+//goland:noinspection GoUnusedParameter
+func (s mockService) getBriefTaskList(userId string) (result []task, err error) {
+	return
+}
+
+func (s realService) getBriefTaskList(userId string) (result []task, err error) {
+	reversedUserID := reverse(userId)
+
+	getRangeRequest := &tablestore.GetRangeRequest{}
+	rangeRowQueryCriteria := &tablestore.RangeRowQueryCriteria{}
+	rangeRowQueryCriteria.TableName = "task"
+
+	startPK := new(tablestore.PrimaryKey)
+	startPK.AddPrimaryKeyColumn("reversed_user_id", reversedUserID)
+	startPK.AddPrimaryKeyColumnWithMaxValue("task_id")
+
+	endPK := new(tablestore.PrimaryKey)
+	endPK.AddPrimaryKeyColumn("reversed_user_id", reversedUserID)
+	endPK.AddPrimaryKeyColumnWithMinValue("task_id")
+
+	rangeRowQueryCriteria.StartPrimaryKey = startPK
+	rangeRowQueryCriteria.EndPrimaryKey = endPK
+	rangeRowQueryCriteria.Direction = tablestore.BACKWARD
+	rangeRowQueryCriteria.MaxVersion = 1
+	rangeRowQueryCriteria.Limit = 3
+	getRangeRequest.RangeRowQueryCriteria = rangeRowQueryCriteria
+
+	getRangeResp, err := tableStoreClientGlobal.GetRange(getRangeRequest)
+
+	if err != nil {
+		return
+	}
+
+	for _, row := range getRangeResp.Rows {
+		result = append(result, task{
+			topic:  row.Columns[0].Value.(string),
+			status: row.Columns[1].Value.(int64),
+		})
 	}
 
 	return
