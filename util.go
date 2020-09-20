@@ -18,6 +18,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"io"
 	"io/ioutil"
+	"log"
 	mrand "math/rand"
 	"net/http"
 	"os"
@@ -29,6 +30,10 @@ import (
 var aliyunRegionID string
 var aliyunAccessKey string
 var aliyunSecretKey string
+
+var mpAPPID string
+var mpSECRET string
+var mpAccessToken string
 
 var GitHubClientID string
 var GitHubClientSecret string
@@ -50,6 +55,16 @@ func autoMigrate() {
 	db.AutoMigrate(&model.ChannelEmail{})
 	db.AutoMigrate(&model.ChannelWeChat{})
 	db.AutoMigrate(&model.OAuthGitHub{})
+}
+
+func setMPAccessToken() {
+	accessToken, err := serviceGlobal.weChatGetAccessToken()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	mpAccessToken = accessToken
 }
 
 func setup(test bool) {
@@ -89,6 +104,18 @@ func setup(test bool) {
 			panic("CARE_GITHUB_CLIENT_SECRET not set")
 		}
 		GitHubClientSecret = GitHubClientSecretLocal
+
+		mpAPPIDLocal, ok := os.LookupEnv("CARE_MP_APPID")
+		if !ok {
+			panic("CARE_MP_APPID not set")
+		}
+		mpAPPID = mpAPPIDLocal
+
+		mpSECRETLocal, ok := os.LookupEnv("CARE_MP_SECRET")
+		if !ok {
+			panic("CARE_MP_SECRET not set")
+		}
+		mpSECRET = mpSECRETLocal
 	}
 
 	mrand.Seed(time.Now().UnixNano())

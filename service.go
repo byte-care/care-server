@@ -2,7 +2,12 @@ package main
 
 import (
 	"crypto/md5"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -32,6 +37,7 @@ type service interface {
 	newTask(reversedUserID string, topic string, _type int) (taskID int64, err error)
 	updateTaskStatus(reversedUserID string, taskID int64, status int) (err error)
 	newLog(taskID int64, content string) error
+	weChatGetAccessToken() (string, error)
 }
 
 type realService struct {
@@ -238,11 +244,6 @@ func (s mockService) logGetToEnd(reversedID string, fromHead bool, lastAutoID in
 	return
 }
 
-type weChatGetAccessTokenRespStruct struct {
-	AccessToken string `json:"access_token"`
-	ExpiresIn   uint32 `json:"expires_in"`
-}
-
 const contentTpl = `{
 	"touser":"%s",
 	"template_id":"%s",       
@@ -353,5 +354,47 @@ func (s realService) updateTaskStatus(reversedUserID string, taskID int64, statu
 }
 
 func (s mockService) updateTaskStatus(reversedUserID string, taskID int64, status int) (err error) {
+	return
+}
+
+type weChatGetAccessTokenRespStruct struct {
+	AccessToken string `json:"access_token"`
+	ExpiresIn   uint32 `json:"expires_in"`
+}
+
+func (s realService) weChatGetAccessToken() (key string, err error) {
+	url := fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", mpAPPID, mpSECRET)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	var wechatResp weChatGetAccessTokenRespStruct
+	err = json.Unmarshal(body, &wechatResp)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	if wechatResp.ExpiresIn == 0 {
+		err = errors.New("Fail to get Access Token")
+		return
+	}
+
+	key = wechatResp.AccessToken
+
+	return
+}
+
+func (s mockService) weChatGetAccessToken() (key string, err error) {
 	return
 }

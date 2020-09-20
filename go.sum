@@ -24,6 +24,8 @@ github.com/byte-care/care-server-core v0.0.0-20200920092355-028cf1d60b5a h1:558v
 github.com/byte-care/care-server-core v0.0.0-20200920092355-028cf1d60b5a/go.mod h1:IwOyCfI7xzXTTpujV5+542aMtmVQi5U3inZxxOfZVAI=
 github.com/byte-care/care-server-core v0.0.0-20200920095414-c9dd23362941 h1:ki1+ZAPneeYmLE332rs74NHGG8a6AAzp3e+ruxu2sP4=
 github.com/byte-care/care-server-core v0.0.0-20200920095414-c9dd23362941/go.mod h1:IwOyCfI7xzXTTpujV5+542aMtmVQi5U3inZxxOfZVAI=
+github.com/byte-care/care-server-core v0.0.0-20200920124955-dcc5044e4977 h1:4vBS75plzvnUf6j1R1EhBnG42nxp8Hq3bPlcLGu5AXM=
+github.com/byte-care/care-server-core v0.0.0-20200920124955-dcc5044e4977/go.mod h1:IwOyCfI7xzXTTpujV5+542aMtmVQi5U3inZxxOfZVAI=
 github.com/cenkalti/backoff v2.2.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=

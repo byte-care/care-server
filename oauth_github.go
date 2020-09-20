@@ -16,7 +16,7 @@ import (
 )
 
 type GitHubProfile struct {
-	ID    uint64
+	ID    uint
 	Email string
 }
 

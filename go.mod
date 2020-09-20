@@ -9,7 +9,7 @@ require (
 	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
 	github.com/bradfitz/gomemcache v0.0.0-20190329173943-551aad21a668 // indirect
 	github.com/byte-care/care-core v0.0.0-20200831064907-c3e82988c4a6
-	github.com/byte-care/care-server-core v0.0.0-20200920095414-c9dd23362941
+	github.com/byte-care/care-server-core v0.0.0-20200920124955-dcc5044e4977
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.3.0 // indirect

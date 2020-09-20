@@ -2,13 +2,18 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/byte-care/care-server-core/model"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/silenceper/wechat/message"
+	"io/ioutil"
 	"log"
+	"net/http"
+	"strconv"
+	"strings"
 )
 
 func wechatGet(c *gin.Context) {
@@ -26,10 +31,11 @@ func wechatPost(c *gin.Context) {
 	}
 
 	if req.MsgType == message.MsgTypeEvent {
+		openID := req.FromUserName
+
 		if req.Event == message.EventClick {
 			if req.EventKey == "task_list" {
 				// OpenID -> UserID
-				openID := req.FromUserName
 				var channelWechat model.ChannelWeChat
 				result := db.Select("user_id").Where("mp_open_id = ?", openID).First(&channelWechat)
 				if result.Error != nil {
@@ -67,12 +73,100 @@ func wechatPost(c *gin.Context) {
 
 				return
 			}
+		} else if req.Event == message.EventSubscribe || req.Event == message.EventScan {
+			userIDString := req.EventKey[8:]
+			userID, err := strconv.ParseUint(userIDString, 10, 64)
+			if err != nil {
+				log.Println(err.Error())
+				c.String(403, "")
+				return
+			}
+
+			openIDString := string(openID)
+
+			var channelWechat model.ChannelWeChat
+			result := db.Select("mp_open_id").Where("user_id = ?", userID).First(&channelWechat)
+			if result.Error != nil {
+				if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+					log.Println(result.Error)
+					return
+				}
+
+				newChannelWechat := &model.ChannelWeChat{
+					UserID:   uint(userID),
+					MPOpenID: openIDString,
+				}
+
+				if err := db.Create(newChannelWechat).Error; err != nil {
+					log.Println(err.Error())
+					c.String(403, "")
+					return
+				}
+
+				c.String(202, "")
+				return
+			}
+
+			if channelWechat.MPOpenID != openIDString {
+				db.Model(&channelWechat).Update("mp_open_id", openIDString)
+			}
+
+			c.Status(202)
+			return
 		}
 	}
 
 	resp := constructTextResp(`ByteCare`, req)
 
 	c.XML(200, resp)
+}
+
+type wechatQRRespStruct struct {
+	Ticket        string `json:"ticket"`
+	ExpireSeconds uint32 `json:"expire_seconds"`
+}
+
+func weChatQR(c *gin.Context) {
+	userID, ok := c.GetPostForm("id")
+	if !ok {
+		c.String(403, "No ID")
+		return
+	}
+
+	url := fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=%s", mpAccessToken)
+
+	bodyString := fmt.Sprintf(`{"expire_seconds": 1592000, "action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": %s}}}`, userID)
+	resp, err := http.Post(url, "application/json", strings.NewReader(bodyString))
+	if err != nil {
+		log.Println(err)
+		c.String(403, "")
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err)
+		c.String(403, "")
+		return
+	}
+
+	var wechatResp wechatQRRespStruct
+	err = json.Unmarshal(body, &wechatResp)
+	if err != nil {
+		log.Println(err)
+		c.String(403, "")
+		return
+	}
+
+	if wechatResp.ExpireSeconds == 0 {
+		log.Println(body)
+		c.String(403, "")
+		return
+	}
+
+	c.String(202, wechatResp.Ticket)
+	return
 }
 
 func constructTextResp(content string, req message.MixMessage) *message.Text {
