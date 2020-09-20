@@ -21,6 +21,7 @@ func wechatPost(c *gin.Context) {
 	var req message.MixMessage
 	if err := c.ShouldBindXML(&req); err != nil {
 		c.String(403, err.Error())
+		log.Println(err.Error())
 		return
 	}
 
@@ -36,6 +37,7 @@ func wechatPost(c *gin.Context) {
 						log.Println(result.Error)
 					}
 					c.String(403, "Not Found User")
+					log.Println("Not Found User")
 					return
 				}
 				userId := channelWechat.UserID
