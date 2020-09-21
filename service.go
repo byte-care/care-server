@@ -31,7 +31,7 @@ type mockWechatNotifyService struct {
 type service interface {
 	email(address string, subject string, body string) error
 	sms(number string, code string) error
-	bin(platform string) ([]string, error)
+	bin(platform string) (string, error)
 	getBriefTaskList(userId string) (result []task, err error)
 	logGetToEnd(reversedID string, fromHead bool, lastAutoID int64) ([]string, int64, error)
 	newTask(reversedUserID string, topic string, _type int) (taskID int64, err error)
@@ -101,8 +101,8 @@ func (s mockService) sms(number string, code string) error {
 	return nil
 }
 
-func (s realService) bin(platform string) (result []string, err error) {
-	bucketName := "kan-bin"
+func (s realService) bin(platform string) (result string, err error) {
+	bucketName := "care-bin"
 
 	bucket, err := ossClientGlobal.Bucket(bucketName)
 	if err != nil {
@@ -110,32 +110,30 @@ func (s realService) bin(platform string) (result []string, err error) {
 	}
 
 	path := fmt.Sprintf("%s/", platform)
+	pathLen := len(path)
 
 	marker := ""
-	for {
-		lsRes, err := bucket.ListObjects(oss.Marker(marker), oss.Prefix(path))
-		if err != nil {
-			return nil, err
-		}
 
-		for _, object := range lsRes.Objects {
-			if object.Key != path {
-				filename := object.Key[len(path):]
-				result = append(result, filename)
-			}
-		}
+	lsRes, err := bucket.ListObjects(oss.Marker(marker), oss.Prefix(path))
+	if err != nil {
+		return
+	}
 
-		if lsRes.IsTruncated {
-			marker = lsRes.NextMarker
-		} else {
-			break
+	if len(lsRes.Objects) != 2 {
+		return "", errors.New("more than one version")
+	}
+
+	for _, object := range lsRes.Objects {
+		if object.Key != path {
+			result = object.Key[pathLen:]
+			return
 		}
 	}
 
-	return
+	return "", errors.New("no version")
 }
 
-func (s mockService) bin(platform string) (result []string, err error) {
+func (s mockService) bin(platform string) (result string, err error) {
 	return
 }
 
