@@ -95,6 +95,8 @@ func logPub(c *gin.Context) {
 		return
 	}
 
+	reversedTaskId := reverse(fmt.Sprint(taskID))
+
 	for {
 		_, contentBytes, err := conn.ReadMessage()
 		if err != nil {
@@ -138,7 +140,7 @@ func logPub(c *gin.Context) {
 
 		content := string(contentBytes)
 
-		if err := serviceGlobal.newLog(taskID, content); err != nil {
+		if err := serviceGlobal.newLog(reversedTaskId, content); err != nil {
 			log.Println(err.Error())
 		}
 	}

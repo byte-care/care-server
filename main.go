@@ -25,6 +25,7 @@ func setupRouter() *gin.Engine {
 	r.POST("/send-email", sendEmail)
 
 	r.GET("/log/pub", logPub)
+	r.GET("/log/sub", logSub)
 
 	return r
 }
