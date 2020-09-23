@@ -41,9 +41,11 @@ func wechatPost(c *gin.Context) {
 				if result.Error != nil {
 					if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
 						log.Println(result.Error)
+						c.Status(403)
+						return
 					}
-					c.String(403, "Not Found User")
-					log.Println("Not Found User")
+					resp := constructTextResp(`请在<a href="https://console.bytecare.xyz/">控制台</a>绑定微信`, req)
+					c.XML(200, resp)
 					return
 				}
 				userId := channelWechat.UserID
