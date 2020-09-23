@@ -167,17 +167,10 @@ func (s realService) getBriefTaskList(userId string) (result []task, err error) 
 	}
 
 	for _, row := range getRangeResp.Rows {
-		log.Println("------")
-		log.Println(row.Columns[0].ColumnName)
-		log.Println(row.Columns[1].ColumnName)
-		log.Println(row.Columns[2].ColumnName)
-		log.Println(row.Columns[3].ColumnName)
-		log.Println(row.Columns[4].ColumnName)
-
-		// result = append(result, task{
-		// 	topic:  row.Columns[0].Value.(string),
-		// 	status: row.Columns[1].Value.(int64),
-		// })
+		result = append(result, task{
+			topic:  row.Columns[2].Value.(string),
+			status: row.Columns[1].Value.(int64),
+		})
 	}
 
 	return
@@ -215,10 +208,10 @@ func (s realService) newTask(reversedUserID string, topic string, _type int) (ta
 	now := time.Now().Unix()
 
 	putRowChange.AddColumn("topic", topic)
-	putRowChange.AddColumn("created_at", now)
-	putRowChange.AddColumn("updated_at", now)
 	putRowChange.AddColumn("status", int64(0))
 	putRowChange.AddColumn("type", int64(_type))
+	putRowChange.AddColumn("created_at", now)
+	putRowChange.AddColumn("updated_at", now)
 
 	putRowChange.SetCondition(tablestore.RowExistenceExpectation_IGNORE)
 	putRowChange.SetReturnPk()
