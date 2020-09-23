@@ -167,10 +167,17 @@ func (s realService) getBriefTaskList(userId string) (result []task, err error) 
 	}
 
 	for _, row := range getRangeResp.Rows {
-		result = append(result, task{
-			topic:  row.Columns[0].Value.(string),
-			status: row.Columns[1].Value.(int64),
-		})
+		log.Println("------")
+		log.Println(row.Columns[0].ColumnName)
+		log.Println(row.Columns[1].ColumnName)
+		log.Println(row.Columns[2].ColumnName)
+		log.Println(row.Columns[3].ColumnName)
+		log.Println(row.Columns[4].ColumnName)
+
+		// result = append(result, task{
+		// 	topic:  row.Columns[0].Value.(string),
+		// 	status: row.Columns[1].Value.(int64),
+		// })
 	}
 
 	return
