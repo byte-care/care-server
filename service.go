@@ -116,18 +116,12 @@ func (s realService) bin(platform string) (result string, err error) {
 		return
 	}
 
-	if len(lsRes.Objects) != 2 {
+	if len(lsRes.Objects) != 1 {
 		return "", errors.New("more than one version")
 	}
 
-	for _, object := range lsRes.Objects {
-		if object.Key != path {
-			result = object.Key[pathLen:]
-			return
-		}
-	}
-
-	return "", errors.New("no version")
+	result = lsRes.Objects[0].Key[pathLen:]
+	return
 }
 
 func (s mockService) bin(platform string) (result string, err error) {
