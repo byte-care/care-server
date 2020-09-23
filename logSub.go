@@ -50,9 +50,9 @@ func logSub(c *gin.Context) {
 	rangeRowQueryCriteria.Limit = 50
 	getRangeRequest.RangeRowQueryCriteria = rangeRowQueryCriteria
 
-	getRangeResp, err := tableStoreClientGlobal.GetRange(getRangeRequest)
-
 	for {
+		getRangeResp, err := tableStoreClientGlobal.GetRange(getRangeRequest)
+
 		for {
 			if err != nil {
 				c.String(403, err.Error())
@@ -68,8 +68,16 @@ func logSub(c *gin.Context) {
 			}
 
 			if getRangeResp.NextStartPrimaryKey == nil {
-				length := len(getRangeResp.Rows) - 1
-				getRangeRequest.RangeRowQueryCriteria.StartPrimaryKey = getRangeResp.Rows[length].PrimaryKey
+				length := len(getRangeResp.Rows)
+				if length == 0 {
+					break
+				}
+
+				lastIndex := length - 1
+
+				pk := getRangeResp.Rows[lastIndex].PrimaryKey
+				pk.PrimaryKeys[1].Value = pk.PrimaryKeys[1].Value.(int64) + 1
+				getRangeRequest.RangeRowQueryCriteria.StartPrimaryKey = pk
 				break
 			} else {
 				getRangeRequest.RangeRowQueryCriteria.StartPrimaryKey = getRangeResp.NextStartPrimaryKey
