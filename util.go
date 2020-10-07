@@ -209,7 +209,7 @@ type idClaims struct {
 }
 
 func generateKey() (string, error) {
-	randomBytes := make([]byte, 32)
+	randomBytes := make([]byte, 16)
 
 	if _, err := io.ReadFull(rand.Reader, randomBytes); err != nil {
 		return "", errors.New("Can't generate key")
