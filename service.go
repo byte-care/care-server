@@ -110,7 +110,7 @@ func (r realWechatNotifyService) logPubNormal(userID uint, topic string) (err er
 		return
 	}
 
-	content := fmt.Sprintf(contentTpl, cid, "✔ 执行成功", topic, "完成", "刚刚", "")
+	content := fmt.Sprintf(contentTpl, cid, "✔ 执行成功", topic, "完成", time.Now().Format("2006-01-02 15:04:05"), "")
 	err = serviceGlobal.weChat(content)
 	return
 }
@@ -121,7 +121,7 @@ func (r realWechatNotifyService) logPubExitAbnormal(userID uint, topic string) (
 		return
 	}
 
-	content := fmt.Sprintf(contentTpl, cid, "❌ 执行失败", topic, "程序异常退出", "刚刚", "")
+	content := fmt.Sprintf(contentTpl, cid, "❌ 执行失败", topic, "程序异常退出", time.Now().Format("2006-01-02 15:04:05"), "")
 	err = serviceGlobal.weChat(content)
 	return
 }
@@ -132,7 +132,7 @@ func (r realWechatNotifyService) logPubDisconnectAbnormal(userID uint, topic str
 		return
 	}
 
-	content := fmt.Sprintf(contentTpl, cid, "❌ 执行失败", topic, "连接异常断开", "刚刚", "")
+	content := fmt.Sprintf(contentTpl, cid, "❌ 执行失败", topic, "连接异常断开", time.Now().Format("2006-01-02 15:04:05"), "")
 	err = serviceGlobal.weChat(content)
 	return
 }
