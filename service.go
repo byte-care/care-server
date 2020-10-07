@@ -371,7 +371,7 @@ const contentTpl = `{
 		"remark":{
 			"value":"%s",
 			"color":"#173177"
-		},
+		}
 	}
 }`
 
