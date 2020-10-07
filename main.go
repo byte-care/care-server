@@ -34,6 +34,7 @@ func main() {
 	setup(false)
 	serviceGlobal = realService{}
 	wechatNotifyServiceGlobal = realWechatNotifyService{}
+	emailNotifyServiceGlobal = realEmailNotifyService{}
 
 	setMPAccessToken()
 	ticker := time.NewTicker(100 * time.Minute)

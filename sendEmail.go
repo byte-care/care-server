@@ -26,7 +26,7 @@ func sendEmail(c *gin.Context) {
 	}
 	specificParameter["topic"] = topic
 
-	// Check Signature and Get User(Contain id, secret_key)
+	// Check Signature and Get User(Contain id, secret_key, default_channel)
 	user, err := checkSignature(c, specificParameter)
 	if err != nil {
 		c.String(403, err.Error())

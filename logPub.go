@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/byte-care/care-server-core/model"
 	"log"
 	"strconv"
 	"time"
@@ -45,8 +46,19 @@ func sendPing(quit chan struct{}, conn *websocket.Conn) {
 
 var pubUpgrader = websocket.Upgrader{}
 
+func chooseNotifyService(user *model.User) notifyService {
+	if user.DefaultChannel == 1 {
+		return wechatNotifyServiceGlobal
+	} else if user.DefaultChannel == 0 {
+		return emailNotifyServiceGlobal
+	}
+
+	log.Println("Other DefaultChannel")
+	return emailNotifyServiceGlobal
+}
+
 func logPub(c *gin.Context) {
-	// Check Signature and Get User(Contain id, secret_key)
+	// Check Signature and Get User(Contain id, secret_key, default_channel)
 	user, err := checkSignature(c, nil)
 	if err != nil {
 		c.String(403, err.Error())
@@ -97,6 +109,8 @@ func logPub(c *gin.Context) {
 
 	reversedTaskId := reverse(fmt.Sprint(taskID))
 
+	notifyService := chooseNotifyService(user)
+
 	for {
 		_, contentBytes, err := conn.ReadMessage()
 		if err != nil {
@@ -106,7 +120,7 @@ func logPub(c *gin.Context) {
 					log.Println(err.Error())
 				}
 
-				err = serviceGlobal.email("1423527051@qq.com", topic, "")
+				err = notifyService.logPubNormal(user.ID, topic)
 				if err != nil {
 					log.Println(err.Error())
 				}
@@ -117,7 +131,7 @@ func logPub(c *gin.Context) {
 					log.Println(err.Error())
 				}
 
-				err = serviceGlobal.email("1423527051@qq.com", topic, "")
+				err = notifyService.logPubExitAbnormal(user.ID, topic)
 				if err != nil {
 					log.Println(err.Error())
 				}
@@ -129,7 +143,7 @@ func logPub(c *gin.Context) {
 
 				log.Println(err.Error())
 
-				err = serviceGlobal.email("1423527051@qq.com", topic, "")
+				err = notifyService.logPubDisconnectAbnormal(user.ID, topic)
 				if err != nil {
 					log.Println(err.Error())
 				}

@@ -49,6 +49,7 @@ var secretKeyGlobal []byte
 var db *gorm.DB
 var serviceGlobal service
 var wechatNotifyServiceGlobal notifyService
+var emailNotifyServiceGlobal notifyService
 
 func autoMigrate() {
 	db.AutoMigrate(&model.User{})
@@ -344,7 +345,7 @@ func checkSignature(c *gin.Context, specificParameter map[string]string) (*model
 	}
 
 	var user model.User
-	db.Select("id, secret_key").Where("access_key = ?", accessKey).First(&user)
+	db.Select("id, secret_key, default_channel").Where("access_key = ?", accessKey).First(&user)
 	if user.ID == 0 {
 		return nil, errors.New("User not Exist")
 	}

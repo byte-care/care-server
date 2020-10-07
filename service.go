@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/byte-care/care-server-core/model"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/requests"
@@ -17,17 +19,146 @@ import (
 )
 
 type notifyService interface {
-	//logPubResult(userID uint, topic string, isSuccessful bool) error
+	logPubNormal(userID uint, topic string) (err error)
+	logPubExitAbnormal(userID uint, topic string) (err error)
+	logPubDisconnectAbnormal(userID uint, topic string) (err error)
+	getChannelID(userID uint) (address string, err error)
+}
+
+type realEmailNotifyService struct {
+}
+
+func (r realEmailNotifyService) getChannelID(userID uint) (address string, err error) {
+	var cEmail model.ChannelEmail
+	result := db.Select("address").Where("user_id = ?", userID).First(&cEmail)
+	err = result.Error
+	if err != nil {
+		return
+	}
+
+	address = cEmail.Address
+	return
+}
+
+func (r realEmailNotifyService) logPubNormal(userID uint, topic string) (err error) {
+	cid, err := r.getChannelID(userID)
+	if err != nil {
+		return
+	}
+
+	err = serviceGlobal.email(cid, topic, "logPubNormal")
+	return
+}
+
+func (r realEmailNotifyService) logPubExitAbnormal(userID uint, topic string) (err error) {
+	cid, err := r.getChannelID(userID)
+	if err != nil {
+		return
+	}
+
+	err = serviceGlobal.email(cid, topic, "logPubExitAbnormal")
+	return
+}
+
+func (r realEmailNotifyService) logPubDisconnectAbnormal(userID uint, topic string) (err error) {
+	cid, err := r.getChannelID(userID)
+	if err != nil {
+		return
+	}
+
+	err = serviceGlobal.email(cid, topic, "logPubDisconnectAbnormal")
+	return
+}
+
+type mockEmailNotifyService struct {
+}
+
+func (m mockEmailNotifyService) getChannelID(userID uint) (address string, err error) {
+	panic("implement me")
+}
+
+func (m mockEmailNotifyService) logPubNormal(userID uint, topic string) (err error) {
+	panic("implement me")
+}
+
+func (m mockEmailNotifyService) logPubExitAbnormal(userID uint, topic string) (err error) {
+	panic("implement me")
+}
+
+func (m mockEmailNotifyService) logPubDisconnectAbnormal(userID uint, topic string) (err error) {
+	panic("implement me")
 }
 
 type realWechatNotifyService struct {
 }
 
+func (r realWechatNotifyService) getChannelID(userID uint) (openID string, err error) {
+	var cWeChat model.ChannelWeChat
+	result := db.Select("mp_open_id").Where("user_id = ?", userID).First(&cWeChat)
+	err = result.Error
+	if err != nil {
+		return
+	}
+
+	openID = cWeChat.MPOpenID
+	return
+}
+
+func (r realWechatNotifyService) logPubNormal(userID uint, topic string) (err error) {
+	cid, err := r.getChannelID(userID)
+	if err != nil {
+		return
+	}
+
+	content := fmt.Sprintf(contentTpl, cid, "✔ 执行成功", topic, "完成", "刚刚", "")
+	err = serviceGlobal.weChat(content)
+	return
+}
+
+func (r realWechatNotifyService) logPubExitAbnormal(userID uint, topic string) (err error) {
+	cid, err := r.getChannelID(userID)
+	if err != nil {
+		return
+	}
+
+	content := fmt.Sprintf(contentTpl, cid, "❌ 执行失败", topic, "程序异常退出", "刚刚", "")
+	err = serviceGlobal.weChat(content)
+	return
+}
+
+func (r realWechatNotifyService) logPubDisconnectAbnormal(userID uint, topic string) (err error) {
+	cid, err := r.getChannelID(userID)
+	if err != nil {
+		return
+	}
+
+	content := fmt.Sprintf(contentTpl, cid, "❌ 执行失败", topic, "连接异常断开", "刚刚", "")
+	err = serviceGlobal.weChat(content)
+	return
+}
+
 type mockWechatNotifyService struct {
+}
+
+func (m mockWechatNotifyService) getChannelID(userID uint) (address string, err error) {
+	panic("implement me")
+}
+
+func (m mockWechatNotifyService) logPubNormal(userID uint, topic string) (err error) {
+	panic("implement me")
+}
+
+func (m mockWechatNotifyService) logPubExitAbnormal(userID uint, topic string) (err error) {
+	panic("implement me")
+}
+
+func (m mockWechatNotifyService) logPubDisconnectAbnormal(userID uint, topic string) (err error) {
+	panic("implement me")
 }
 
 type service interface {
 	email(address string, subject string, body string) error
+	weChat(content string) error
 	sms(number string, code string) error
 	bin(platform string) (string, error)
 	getBriefTaskList(userId string) (result []task, err error)
@@ -40,7 +171,48 @@ type service interface {
 type realService struct {
 }
 
+func (s realService) weChat(content string) (err error) {
+	url := fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=%s", mpAccessToken)
+
+	req, err := http.NewRequest("POST", url, strings.NewReader(content))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	var wechatResp weChatSendMessageRespStruct
+	err = json.Unmarshal(body, &wechatResp)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	if wechatResp.ErrCode != 0 {
+		err = errors.New("Fail to send Message")
+		log.Println(wechatResp.ErrMsg)
+		return
+	}
+
+	return
+}
+
 type mockService struct {
+}
+
+func (s mockService) weChat(content string) error {
+	panic("implement me")
 }
 
 func (s realService) email(address string, subject string, body string) error {
@@ -178,17 +350,30 @@ func (s realService) getBriefTaskList(userId string) (result []task, err error) 
 
 const contentTpl = `{
 	"touser":"%s",
-	"template_id":"%s",       
+	"template_id":"yklsI1iWhuOsGsXdraYXROMYLfXoiFMXH6FGaR1kqUE",       
 	"data":{
+		"first":{
+			"value":"%s",
+			"color":"#173177"
+		},
 		"keyword1":{
 			"value":"%s",
 			"color":"#173177"
-		}
+		},
+		"keyword2":{
+			"value":"%s",
+			"color":"#173177"
+		},
+		"keyword3":{
+			"value":"%s",
+			"color":"#173177"
+		},
+		"remark":{
+			"value":"%s",
+			"color":"#173177"
+		},
 	}
 }`
-
-const goodTplID = "F7KKMDk5Cm61PU8XJNAXGEWWFf3UBhEq1F5tsYeMygU"
-const badTplID = "3AG4C6YUJBfZ6pt1jwAhzaRd_biqT0vQj9iHmEPgnKc"
 
 type weChatSendMessageRespStruct struct {
 	ErrCode uint32 `json:"errcode"`

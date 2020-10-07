@@ -12,6 +12,7 @@ func init() {
 	router = setupRouter()
 	serviceGlobal = mockService{}
 	wechatNotifyServiceGlobal = mockWechatNotifyService{}
+	emailNotifyServiceGlobal = mockEmailNotifyService{}
 }
 
 func dropDB() {
