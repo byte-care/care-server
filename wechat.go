@@ -63,7 +63,7 @@ func wechatPost(c *gin.Context) {
 					content = "Empty Task List"
 				} else {
 					buf := bytes.Buffer{}
-					for _, task := range taskList {
+					for i, task := range taskList {
 						var statusIcon string
 						if task.status == 0 {
 							statusIcon = "⏳"
@@ -75,14 +75,23 @@ func wechatPost(c *gin.Context) {
 							statusIcon = "❌"
 						}
 
+						const briefLen = 20
+
 						var briefTopic string
-						if len(task.topic) < 10 {
+						if len(task.topic) < briefLen {
 							briefTopic = task.topic
 						} else {
-							briefTopic = fmt.Sprintf("%s...", task.topic[:10])
+							briefTopic = fmt.Sprintf("%s...", task.topic[:briefLen])
 						}
 
-						buf.WriteString(fmt.Sprintf(`%s %s<br><a href="https://www.bytecare.xyz/task-detail.html?id=%d">详情</a><br><br>`, statusIcon, briefTopic, task.id))
+						buf.WriteString(fmt.Sprintf(`%s %s
+<a href="https://www.bytecare.xyz/task-detail.html?id=%d">详情</a>
+`, statusIcon, briefTopic, task.id))
+
+						if i != len(taskList)-1 {
+							buf.WriteString(`
+`)
+						}
 					}
 					content = buf.String()
 				}
