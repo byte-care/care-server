@@ -21,7 +21,7 @@ func TestViewKey(t *testing.T) {
 
 	// ---
 	assert.Equal(t, 200, w.Code)
-	assert.Equal(t, 119, len(w.Body.String()))
+	assert.Equal(t, 79, len(w.Body.String()))
 	//
 
 	// ❌ Failure
