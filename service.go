@@ -46,7 +46,7 @@ func (r realEmailNotifyService) logPubNormal(userID uint, topic string) (err err
 		return
 	}
 
-	err = serviceGlobal.email(cid, topic, "logPubNormal")
+	err = serviceGlobal.email(cid, topic, "✔ 成功")
 	return
 }
 
@@ -56,7 +56,7 @@ func (r realEmailNotifyService) logPubExitAbnormal(userID uint, topic string) (e
 		return
 	}
 
-	err = serviceGlobal.email(cid, topic, "logPubExitAbnormal")
+	err = serviceGlobal.email(cid, topic, "❌ 异常退出")
 	return
 }
 
@@ -66,7 +66,7 @@ func (r realEmailNotifyService) logPubDisconnectAbnormal(userID uint, topic stri
 		return
 	}
 
-	err = serviceGlobal.email(cid, topic, "logPubDisconnectAbnormal")
+	err = serviceGlobal.email(cid, topic, "❌ 连接异常")
 	return
 }
 
@@ -301,6 +301,7 @@ func (s mockService) bin(platform string) (result string, err error) {
 }
 
 type task struct {
+	id     int64
 	topic  string
 	status int64
 }
@@ -340,6 +341,7 @@ func (s realService) getBriefTaskList(userId string) (result []task, err error) 
 
 	for _, row := range getRangeResp.Rows {
 		result = append(result, task{
+			id:     row.PrimaryKey.PrimaryKeys[1].Value.(int64),
 			topic:  row.Columns[2].Value.(string),
 			status: row.Columns[1].Value.(int64),
 		})

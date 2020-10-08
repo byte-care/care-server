@@ -64,7 +64,25 @@ func wechatPost(c *gin.Context) {
 				} else {
 					buf := bytes.Buffer{}
 					for _, task := range taskList {
-						buf.WriteString(fmt.Sprintf("%d %s\n", task.status, task.topic))
+						var statusIcon string
+						if task.status == 0 {
+							statusIcon = "⏳"
+						} else if task.status == 1 {
+							statusIcon = "✔"
+						} else if task.status == 2 {
+							statusIcon = "❌"
+						} else if task.status == 3 {
+							statusIcon = "❌"
+						}
+
+						var briefTopic string
+						if len(task.topic) < 10 {
+							briefTopic = task.topic
+						} else {
+							briefTopic = fmt.Sprintf("%s...", task.topic[:10])
+						}
+
+						buf.WriteString(fmt.Sprintf(`%d %s %s\n<a href="https://www.baidu.com/">详情</a>\n\n`, task.id, statusIcon, briefTopic))
 					}
 					content = buf.String()
 				}
