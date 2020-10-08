@@ -82,7 +82,7 @@ func wechatPost(c *gin.Context) {
 							briefTopic = fmt.Sprintf("%s...", task.topic[:10])
 						}
 
-						buf.WriteString(fmt.Sprintf(`%d %s %s\n<a href="https://www.baidu.com/">详情</a>\n\n`, task.id, statusIcon, briefTopic))
+						buf.WriteString(fmt.Sprintf(`%s %s<br><a href="https://www.bytecare.xyz/task-detail.html?id=%d">详情</a><br><br>`, statusIcon, briefTopic, task.id))
 					}
 					content = buf.String()
 				}

@@ -131,7 +131,7 @@ func OAuthGitHub(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("token", jwtToken, 36000, "/", ".bytecare.xyz", true, false)
+	c.SetCookie("token", jwtToken, 72000, "/", ".bytecare.xyz", true, false)
 
-	c.Redirect(http.StatusFound, "https://console.bytecare.xyz/")
+	c.Redirect(http.StatusFound, "https://www.bytecare.xyz/account-general.html")
 }
