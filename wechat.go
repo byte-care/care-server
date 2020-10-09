@@ -75,14 +75,7 @@ func wechatPost(c *gin.Context) {
 							statusIcon = "❌"
 						}
 
-						const briefLen = 20
-
-						var briefTopic string
-						if len(task.topic) < briefLen {
-							briefTopic = task.topic
-						} else {
-							briefTopic = fmt.Sprintf("%s...", task.topic[:briefLen])
-						}
+						briefTopic := getBriefTopic(task.topic, 20)
 
 						buf.WriteString(fmt.Sprintf(`%s %s
 <a href="https://www.bytecare.xyz/task-detail.html?id=%d">详情</a>
@@ -148,6 +141,16 @@ func wechatPost(c *gin.Context) {
 	resp := constructTextResp(`ByteCare`, req)
 
 	c.XML(200, resp)
+}
+
+func getBriefTopic(topic string, briefLen int) string {
+	var briefTopic string
+	if len(topic) < briefLen {
+		briefTopic = topic
+	} else {
+		briefTopic = fmt.Sprintf("%s...", topic[:briefLen])
+	}
+	return briefTopic
 }
 
 type wechatQRRespStruct struct {

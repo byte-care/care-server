@@ -46,7 +46,7 @@ func (r realEmailNotifyService) logPubNormal(userID uint, topic string) (err err
 		return
 	}
 
-	err = serviceGlobal.email(cid, topic, "✔ 成功")
+	err = serviceGlobal.email(cid, getBriefTopic(topic, 20), "✔ 成功")
 	return
 }
 
@@ -56,7 +56,7 @@ func (r realEmailNotifyService) logPubExitAbnormal(userID uint, topic string) (e
 		return
 	}
 
-	err = serviceGlobal.email(cid, topic, "❌ 异常退出")
+	err = serviceGlobal.email(cid, getBriefTopic(topic, 20), "❌ 异常退出")
 	return
 }
 
@@ -66,7 +66,7 @@ func (r realEmailNotifyService) logPubDisconnectAbnormal(userID uint, topic stri
 		return
 	}
 
-	err = serviceGlobal.email(cid, topic, "❌ 连接异常")
+	err = serviceGlobal.email(cid, getBriefTopic(topic, 20), "❌ 连接异常")
 	return
 }
 
@@ -110,7 +110,7 @@ func (r realWechatNotifyService) logPubNormal(userID uint, topic string) (err er
 		return
 	}
 
-	content := fmt.Sprintf(contentTpl, cid, "✔ 执行成功", topic, "完成", time.Now().Format("2006-01-02 15:04:05"), "")
+	content := fmt.Sprintf(contentTpl, cid, "✔ 执行成功", getBriefTopic(topic, 40), "完成", time.Now().Format("2006-01-02 15:04:05"), "")
 	err = serviceGlobal.weChat(content)
 	return
 }
@@ -121,7 +121,7 @@ func (r realWechatNotifyService) logPubExitAbnormal(userID uint, topic string) (
 		return
 	}
 
-	content := fmt.Sprintf(contentTpl, cid, "❌ 执行失败", topic, "程序异常退出", time.Now().Format("2006-01-02 15:04:05"), "")
+	content := fmt.Sprintf(contentTpl, cid, "❌ 执行失败", getBriefTopic(topic, 40), "程序异常退出", time.Now().Format("2006-01-02 15:04:05"), "")
 	err = serviceGlobal.weChat(content)
 	return
 }
@@ -132,7 +132,7 @@ func (r realWechatNotifyService) logPubDisconnectAbnormal(userID uint, topic str
 		return
 	}
 
-	content := fmt.Sprintf(contentTpl, cid, "❌ 执行失败", topic, "连接异常断开", time.Now().Format("2006-01-02 15:04:05"), "")
+	content := fmt.Sprintf(contentTpl, cid, "❌ 执行失败", getBriefTopic(topic, 40), "连接异常断开", time.Now().Format("2006-01-02 15:04:05"), "")
 	err = serviceGlobal.weChat(content)
 	return
 }
