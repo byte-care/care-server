@@ -59,11 +59,17 @@ func logSub(c *gin.Context) {
 				return
 			}
 
-			for _, row := range getRangeResp.Rows {
-				err := conn.WriteMessage(websocket.TextMessage, []byte(row.Columns[0].Value.(string)))
-				if err != nil {
-					c.String(403, err.Error())
+			if len(getRangeResp.Rows) == 0 {
+				if err := conn.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(writeWait)); err != nil {
 					return
+				}
+			} else {
+				for _, row := range getRangeResp.Rows {
+					err := conn.WriteMessage(websocket.TextMessage, []byte(row.Columns[0].Value.(string)))
+					if err != nil {
+						c.String(403, err.Error())
+						return
+					}
 				}
 			}
 
